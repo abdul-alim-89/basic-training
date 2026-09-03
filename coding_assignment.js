@@ -33,7 +33,7 @@ for(let i=0; i < string.length; i++){
     }
   }
 }
-console.log(feq)
+//console.log(feq)
 return feq;
   
 }
@@ -56,7 +56,7 @@ function flatten(unflatObject) {
   }
 
   flat(unflatObject, "");
-console.log(result)
+  //console.log(result)
   return result;
   
 }
@@ -82,6 +82,6 @@ function unflatten(flatObject) {
         }
     }
   }
-  console.log(result)
+  //console.log(result)
   return result;
 }
