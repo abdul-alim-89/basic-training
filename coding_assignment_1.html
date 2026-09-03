@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/css/bootstrap.min.css" integrity="sha512-NZ19NrT58XPK5sXqXnnvtf9T5kLXSzGQlVZL9taZWeTBtXoN3xIfTdxbkQh6QSoJfJgpojRqMfhyqBAAEeiXcA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/js/bootstrap.min.js" integrity="sha512-Pv/SmxhkTB6tWGQWDa6gHgJpfBdIpyUy59QkbshS1948GRmj6WgZz18PaDMOqaEyKLRAvgil7sx/WACNGE4Txw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  function deepEqual(a, b)
+  {
+    if( (typeof a == 'object' && a != null) &&
+        (typeof b == 'object' && b != null) )
+    {
+       var count = [0,0];
+       for( var key in a) count[0]++;
+       for( var key in b) count[1]++;
+       if( count[0]-count[1] != 0) {return false;}
+       for( var key in a)
+       {
+         if(!(key in b) || !deepEqual(a[key],b[key])) {return false;}
+       }
+       for( var key in b)
+       {
+         if(!(key in a) || !deepEqual(b[key],a[key])) {return false;}
+       }
+       return true;
+    }
+    else
+    {
+       return a === b;
+    }
+  }
+  function test(executor, tests) {
+    for(var testIndx in tests) {
+      if(typeof tests[testIndx].output === "object") {
+        if(!deepEqual(executor(tests[testIndx].input), tests[testIndx].output)) {
+          return false;
+        }
+      }
+      else if(executor(tests[testIndx].input) !== tests[testIndx].output) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function declareFailure(element) {
+    $(element).removeClass("warning");
+    $(element).addClass("danger");
+  }
+  function declareSuccess(element) {
+    $(element).removeClass("danger");
+    $(element).addClass("success");
+  }
+  function testSecondLargest() {
+    declareFailure("#one");
+    if(test(secondLargest, [
+      {
+        input: [3,56,7,32,9,14],
+        output: 32
+      },
+      {
+        input: [21, 87, 91, 31, 97, 59, 8, 83, 27, 23, 76, 72, 31, 91, 65, 77, 84, 27, 56, 59],
+        output: 91
+      },
+      {
+        input: [21, 87, 91, 31, 97, 59, 8, 83, 27, 23, 76, 72, 31, 91, 65, 77, 84, 92, 56, 59],
+        output: 92
+      },
+      {
+        input: [111, 0, 20, 0, 2],
+        output: 20
+      }
+    ]))
+      declareSuccess("#one");
+  }
+  
+  function testCalculateFrequency() {
+    declareFailure("#two");
+    if(test(calculateFrequency, [
+      {
+        input: "dummy",
+        output: { d: 1, u: 1, m: 2, y: 1 }
+      },
+      {
+        input: "dummy text",
+        output: { d: 1, u: 1, m: 2, y: 1, t: 2, e: 1, x: 1 }
+      },
+      {
+        input: "shali is running fast",
+        output: { s: 3, h: 1, a: 2, l: 1, i: 3, r: 1, u: 1, n: 3, g: 1, f: 1, t: 1 }
+      },
+      {
+        input: "u@#d$fkj$#!kds",
+        output: { d: 2, f: 1, j: 1, k: 2, s: 1, u: 1 }
+      }
+    ]))
+      declareSuccess("#two");
+  }
+  function testFlatten() {
+    declareFailure("#three");
+    if(test(flatten, [
+      {
+        input: { "flatJSON": false, "i": { "am": { "not": { "so": { "flat": true, "unflat": false } }, "a": "tree" } }, "dates": [ { "day": 1 }, { "day": 8947 } ] },
+        output: { "flatJSON": false, "i.am.not.so.flat": true, "i.am.not.so.unflat": false, "i.am.a": "tree", "dates.0.day": 1, "dates.1.day": 8947 }
+      }
+    ]))
+      declareSuccess("#three");
+  }
+  function testUnflatten() {
+    declareFailure("#four");
+    if(test(unflatten, [
+      {
+        input: { "flatJSON": false, "i.am.not.so.flat": true, "i.am.not.so.unflat": false, "i.am.a": "tree", "dates.0.day": 1, "dates.1.day": 8947 },
+        output: { "flatJSON": false, "i": { "am": { "not": { "so": { "flat": true, "unflat": false } }, "a": "tree" } }, "dates": [ { "day": 1 }, { "day": 8947 } ] }
+      }
+    ]))
+      declareSuccess("#four");
+  }
+</script>
+</head>
+<body>
+<div class="container">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Function</th>
+        <th>Test</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="warning" id="one">
+        <td>secondLargest</td>
+        <td><input class="btn btn-primary" type="button" value="Test" onclick="testSecondLargest()"></td>
+      </tr>
+      <tr class="warning" id="two">
+        <td>calculateFrequency</td>
+        <td><input class="btn btn-primary" type="button" value="Test" onclick="testCalculateFrequency()"></td>
+      </tr>
+      <tr class="warning" id="three">
+        <td>flatten</td>
+        <td><input class="btn btn-primary" type="button" value="Test" onclick="testFlatten()"></td>
+      </tr>
+      <tr class="warning" id="four">
+        <td>unflatten</td>
+        <td><input class="btn btn-primary" type="button" value="Test" onclick="testUnflatten()"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+    // Problem 1: Complete the secondLargest function which takes in an array of numbers in input and return the second biggest number in the array. (without using sort)?
+function secondLargest(array) {
+  let largest = -Infinity;
+  let second_largest = -Infinity;
+
+  for (const num of array) {
+    if (num > largest) {
+      second_largest = largest;
+      largest = num;
+    } else if (num > second_largest && num != largest) {
+      second_largest = num;
+    }
+  }
+
+  return second_largest;
+}
+
+// Problem 2: Complete the calculateFrequency function that takes lowercase string as input and returns frequency of all english alphabet. (using only array, no in-built function)
+function calculateFrequency(string) {
+  // Write your code here
+let feq = {}
+
+for(let i=0; i < string.length; i++){
+  let char = string[i];
+  if(char >= 'a' && char <= 'z'){
+  if(feq[char])
+    {
+      feq[char] = feq[char] + 1;
+    }
+  else
+    {
+      feq[char] = 1;
+    }
+  }
+}
+console.log(feq)
+return feq;
+  
+}
+
+// Problem 3: Complete the flatten function that takes a JS Object, returns a JS Object in flatten format (compressed)
+function flatten(unflatObject) {
+  // Write your code here
+  let result = {};
+
+  function flat(current, key) {
+    for (let k in current) {
+      let newKey = key ? key + "." + k : k;
+
+      if (typeof current[k] === "object" && current[k] !== null) {
+        flat(current[k], newKey);
+      } else {
+        result[newKey] = current[k];
+      }
+    }
+  }
+
+  flat(unflatObject, "");
+console.log(result)
+  return result;
+  
+}
+
+// Problem 4: Complete the unflatten function that takes a JS Object, returns a JS Object in unflatten format
+function unflatten(flatObject) {
+  let result = {} // empty object
+  
+  for(let key in flatObject){
+    let current_obj = result;
+    let keys = key.split(".");
+    for(let i=0; i < keys.length; i++){
+      let current_key = keys[i];
+      if(i == keys.length - 1){
+        current_obj[current_key] = flatObject[key];
+      }
+      else
+        {
+          if(!current_obj[current_key]){
+            current_obj[current_key] = {};
+          }
+          current_obj = current_obj[current_key];
+        }
+    }
+  }
+  console.log(result)
+  return result;
+}
+
+</script>
+
+</body>
+
+</html>
